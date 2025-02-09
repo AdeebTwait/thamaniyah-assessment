@@ -1,58 +1,73 @@
-import { injectable } from 'tsyringe';
+import { injectable } from 'tsyringe'
 import pino from 'pino'
 import { config } from '@/config/env.config'
-import { RequestContext } from './context'
+import { RequestContext } from '@/utils/context'
 
 @injectable()
 export class Logger {
-  private logger: pino.Logger
+	private logger: pino.Logger
 
-  constructor() {
-    this.logger = pino({
-      level: config.env.LOG_LEVEL,
-      transport: {
-        target: 'pino-pretty',
-        options: {
-          colorize: true
-        }
-      },
-      mixin() {
-        return {
-          interaction_id: RequestContext.getInteractionId()
-        }
-      }
-    })
-  }
+	constructor() {
+		// Create an async destination stream
+		const destination = pino.destination({
+			sync: false, // Enable async logging
+			minLength: 4096, // Buffer before writing
+			mkdir: true // Create directory if doesn't exist
+		})
 
-  info(obj: object | string, msg?: string): void {
-    if (typeof obj === 'string') {
-      this.logger.info({ msg: obj })
-    } else {
-      this.logger.info(obj, msg)
-    }
-  }
+		// Handle process exit to flush logs
+		process.on('beforeExit', () => {
+			destination.flushSync()
+		})
 
-  error(obj: object | string, msg?: string): void {
-    if (typeof obj === 'string') {
-      this.logger.error({ msg: obj })
-    } else {
-      this.logger.error(obj, msg)
-    }
-  }
+		this.logger = pino(
+			{
+				level: config.env.LOG_LEVEL,
+				transport: {
+					target: 'pino-pretty',
+					options: {
+						colorize: true
+					}
+				},
+				mixin() {
+					return {
+						interaction_id: RequestContext.getInteractionId()
+					}
+				}
+			},
+			destination
+		)
+	}
 
-  warn(obj: object | string, msg?: string): void {
-    if (typeof obj === 'string') {
-      this.logger.warn({ msg: obj })
-    } else {
-      this.logger.warn(obj, msg)
-    }
-  }
+	async info(obj: object | string, msg?: string): Promise<void> {
+		if (typeof obj === 'string') {
+			await this.logger.info({ msg: obj })
+		} else {
+			await this.logger.info(obj, msg)
+		}
+	}
 
-  debug(obj: object | string, msg?: string): void {
-    if (typeof obj === 'string') {
-      this.logger.debug({ msg: obj })
-    } else {
-      this.logger.debug(obj, msg)
-    }
-  }
-} 
+	async error(obj: object | string, msg?: string): Promise<void> {
+		if (typeof obj === 'string') {
+			await this.logger.error({ msg: obj })
+		} else {
+			await this.logger.error(obj, msg)
+		}
+	}
+
+	async warn(obj: object | string, msg?: string): Promise<void> {
+		if (typeof obj === 'string') {
+			await this.logger.warn({ msg: obj })
+		} else {
+			await this.logger.warn(obj, msg)
+		}
+	}
+
+	async debug(obj: object | string, msg?: string): Promise<void> {
+		if (typeof obj === 'string') {
+			await this.logger.debug({ msg: obj })
+		} else {
+			await this.logger.debug(obj, msg)
+		}
+	}
+}
