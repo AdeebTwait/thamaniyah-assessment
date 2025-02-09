@@ -7,6 +7,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string(),
   FRONTEND_URL: z.string().default('http://localhost:3000'),
   LOG_LEVEL: z.string().default('info'),
+  ITUNES_API_URL: z.string(),
 })
 
 type EnvConfig = z.infer<typeof envSchema>

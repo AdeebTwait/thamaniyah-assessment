@@ -2,5 +2,19 @@
 */**/.env 
 node_modules
 */**/node_modules
-*.log
+
+# next.js
 */**/.next
+*/**/out/
+
+# production
+*/**/build
+
+# debug
+*.log
+*/**/*.log*
+
+
+# typescript
+*/**/*.tsbuildinfo
+*/**/next-env.d.ts
