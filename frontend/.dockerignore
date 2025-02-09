@@ -1,0 +1,16 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+.git
+.env*
+.husky
+.vscode
+coverage
+.eslintrc*
+.prettier*
+.github
+*.log
+dist 
