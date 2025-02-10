@@ -3,7 +3,6 @@
 // React and third-party imports
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { useDebounce } from 'use-debounce';
 import { Search } from 'lucide-react';
 
 // Components
@@ -13,6 +12,7 @@ import { Sidebar } from '@/components/sidebar';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { useDebounce } from '@/hooks/use-debounce';
 
 // API and types
 import { searchPodcasts } from '@/lib/api';
@@ -28,7 +28,7 @@ export default function PodcastSearch() {
 	const [podcasts, setPodcasts] = useState<Podcast[]>([]);
 	const [episodes, setEpisodes] = useState<Podcast[]>([]);
 	const [loading, setLoading] = useState(false);
-	const [debouncedSearch] = useDebounce(search, DEBOUNCE_MS);
+	const [inputValue, debouncedSearch] = useDebounce(search, DEBOUNCE_MS);
 	const { toast } = useToast();
 
 	// Update URL when search changes
